@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Load Balancer Control Center</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    
+    <!-- Top Navigation Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Docker Load Balancer</div>
+          <div class="brand-subtitle">Controller & MCP Mesh Monitor</div>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="badge mcp-indicator" id="mcp-sync-badge">
+          <span class="status-dot green pulse"></span>
+          <span>MCP Client: Ready</span>
+        </div>
+        <div class="badge health-badge" id="cluster-health-badge">
+          <span class="status-dot green"></span>
+          <span>Cluster Active</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Content -->
+    <main class="dashboard-grid">
+
+      <!-- Column 1 & 2: Containers Status Cards -->
+      <section class="section-full">
+        <div class="section-header">
+          <h2>Container Cluster Nodes</h2>
+          <span class="section-desc">Real-time status, health check responses, and container controls</span>
+        </div>
+
+        <div class="containers-grid">
+          
+          <!-- Container A Card -->
+          <div class="card container-card" id="card-container-a">
+            <div class="card-header">
+              <div class="container-title">
+                <span class="node-icon a-glow">A</span>
+                <div>
+                  <div class="node-name">Container A</div>
+                  <div class="node-sub">container_a (Port 8001)</div>
+                </div>
+              </div>
+              <div class="status-pill" id="status-pill-a">Healthy</div>
+            </div>
+
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">In Flight</div>
+                <div class="metric-val" id="metric-inflight-a">0</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Served</div>
+                <div class="metric-val" id="metric-served-a">0</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Effective Split</div>
+                <div class="metric-val text-cyan" id="metric-eff-a">50%</div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-outline" id="btn-start-a" onclick="startContainer('A')">Start</button>
+              <button class="btn btn-outline" id="btn-stop-a" onclick="stopContainer('A')">Drain & Stop</button>
+              <button class="btn btn-danger-soft" id="btn-toggle-unhealthy-a" onclick="toggleUnhealthy('A')">Simulate Failure</button>
+            </div>
+          </div>
+
+          <!-- Container B Card -->
+          <div class="card container-card" id="card-container-b">
+            <div class="card-header">
+              <div class="container-title">
+                <span class="node-icon b-glow">B</span>
+                <div>
+                  <div class="node-name">Container B</div>
+                  <div class="node-sub">container_b (Port 8002)</div>
+                </div>
+              </div>
+              <div class="status-pill" id="status-pill-b">Healthy</div>
+            </div>
+
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">In Flight</div>
+                <div class="metric-val" id="metric-inflight-b">0</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Served</div>
+                <div class="metric-val" id="metric-served-b">0</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Effective Split</div>
+                <div class="metric-val text-purple" id="metric-eff-b">50%</div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-outline" id="btn-start-b" onclick="startContainer('B')">Start</button>
+              <button class="btn btn-outline" id="btn-stop-b" onclick="stopContainer('B')">Drain & Stop</button>
+              <button class="btn btn-danger-soft" id="btn-toggle-unhealthy-b" onclick="toggleUnhealthy('B')">Simulate Failure</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Traffic Routing & Split Controls -->
+      <section class="card split-control-card">
+        <div class="card-header">
+          <h3>Traffic Split & Routing</h3>
+          <span class="badge" id="split-mode-badge">Active: A=50% / B=50%</span>
+        </div>
+
+        <div class="split-slider-wrapper">
+          <div class="split-slider-labels">
+            <span class="label-a">Container A: <strong id="val-split-a">50%</strong></span>
+            <span class="label-b">Container B: <strong id="val-split-b">50%</strong></span>
+          </div>
+
+          <div class="slider-container">
+            <input type="range" min="0" max="100" value="50" class="split-slider" id="split-slider" oninput="onSliderChange(this.value)">
+          </div>
+
+          <!-- Visual Bar Representation -->
+          <div class="ratio-bar">
+            <div class="bar-segment bar-a" id="visual-bar-a" style="width: 50%;">A (50%)</div>
+            <div class="bar-segment bar-b" id="visual-bar-b" style="width: 50%;">B (50%)</div>
+          </div>
+        </div>
+
+        <div class="preset-buttons">
+          <button class="btn btn-ghost" onclick="setPreset(100, 0)">100% A</button>
+          <button class="btn btn-ghost" onclick="setPreset(80, 20)">80/20</button>
+          <button class="btn btn-ghost" onclick="setPreset(50, 50)">50/50</button>
+          <button class="btn btn-ghost" onclick="setPreset(20, 80)">20/80</button>
+          <button class="btn btn-ghost" onclick="setPreset(0, 100)">100% B</button>
+          <button class="btn btn-primary" onclick="applySplit()">Apply Split</button>
+        </div>
+      </section>
+
+      <!-- Safe Rollout Orchestrator -->
+      <section class="card rollout-card">
+        <div class="card-header">
+          <h3>Safe Rollout Orchestrator</h3>
+          <span class="badge" id="rollout-status-badge">Idle</span>
+        </div>
+
+        <div class="rollout-stepper">
+          <div class="step-item" id="step-start">
+            <div class="step-circle">1</div>
+            <div class="step-label">Start Target</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" id="step-health">
+            <div class="step-circle">2</div>
+            <div class="step-label">Wait Healthy</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" id="step-shift">
+            <div class="step-circle">3</div>
+            <div class="step-label">Move Traffic</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" id="step-drain">
+            <div class="step-circle">4</div>
+            <div class="step-label">Drain Old</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" id="step-stop">
+            <div class="step-circle">5</div>
+            <div class="step-label">Stop Old</div>
+          </div>
+        </div>
+
+        <div class="rollout-buttons">
+          <button class="btn btn-action" id="btn-rollout-ab" onclick="startRollout('A', 'B')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Safe Rollout: A &rarr; B
+          </button>
+          <button class="btn btn-action" id="btn-rollout-ba" onclick="startRollout('B', 'A')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Safe Rollout: B &rarr; A
+          </button>
+        </div>
+      </section>
+
+      <!-- Traffic Generator Panel -->
+      <section class="card traffic-card">
+        <div class="card-header">
+          <h3>Load Balancer Traffic Generator</h3>
+          <span class="badge" id="traffic-gen-badge">Stopped</span>
+        </div>
+
+        <div class="traffic-controls">
+          <div class="input-group">
+            <label for="traffic-rpm">Target Rate (RPM):</label>
+            <input type="number" id="traffic-rpm" value="120" min="10" max="6000" step="10">
+          </div>
+          <div class="traffic-btn-group">
+            <button class="btn btn-success" id="btn-toggle-traffic" onclick="toggleTrafficGen()">Start Traffic</button>
+            <button class="btn btn-ghost" onclick="resetTrafficStats()">Reset Stats</button>
+          </div>
+        </div>
+
+        <div class="traffic-stats-grid">
+          <div class="stat-box">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Total Sent</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num text-green" id="stat-success">0</div>
+            <div class="stat-label">Success (200)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num text-red" id="stat-failed">0</div>
+            <div class="stat-label">Failed (5xx)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num text-cyan" id="stat-by-a">0</div>
+            <div class="stat-label">Served by A</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num text-purple" id="stat-by-b">0</div>
+            <div class="stat-label">Served by B</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Event Logs Feed -->
+      <section class="card logs-card section-full">
+        <div class="card-header">
+          <div class="log-title-area">
+            <h3>Controller & MCP Audit Log</h3>
+            <span class="sub-text">Every action logged with source, time, and result</span>
+          </div>
+
+          <div class="log-filter-tabs">
+            <button class="filter-tab active" onclick="filterLogs('all')">All</button>
+            <button class="filter-tab" onclick="filterLogs('mcp')">MCP Only</button>
+            <button class="filter-tab" onclick="filterLogs('dashboard')">Dashboard</button>
+            <button class="filter-tab" onclick="filterLogs('system')">System</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th style="width: 110px;">Time</th>
+                <th style="width: 100px;">Source</th>
+                <th style="width: 170px;">Action</th>
+                <th style="width: 110px;">Result</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr>
+                <td colspan="5" class="empty-state">Loading controller event history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

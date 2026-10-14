@@ -1,0 +1,52 @@
+services:
+  app_a:
+    build:
+      context: ./app_a
+    container_name: container_a
+    environment:
+      - CONTAINER_NAME=A
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 3s
+      timeout: 2s
+      retries: 3
+      start_period: 3s
+    restart: unless-stopped
+
+  app_b:
+    build:
+      context: ./app_b
+    container_name: container_b
+    environment:
+      - CONTAINER_NAME=B
+    ports:
+      - "8002:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 3s
+      timeout: 2s
+      retries: 3
+      start_period: 3s
+    restart: unless-stopped
+
+  controller:
+    build:
+      context: ./controller
+    container_name: load_balancer_controller
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - APP_A_URL=http://app_a:8000
+      - APP_B_URL=http://app_b:8000
+      - CONTAINER_A_DOCKER_NAME=container_a
+      - CONTAINER_B_DOCKER_NAME=container_b
+    depends_on:
+      app_a:
+        condition: service_healthy
+      app_b:
+        condition: service_healthy
+    restart: unless-stopped
