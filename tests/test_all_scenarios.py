@@ -164,8 +164,13 @@ async def test_07_cannot_stop_last_healthy_container():
 async def test_08_inflight_request_finishes_during_drain():
     """Verify an in-flight request finishes cleanly before the container stops."""
     async with httpx.AsyncClient(base_url=CONTROLLER_URL, timeout=20.0) as client:
-        # Set traffic 100% to A
+        # Ensure clean state
+        await client.post("/containers/A/start?source=test")
+        await client.post("/containers/B/start?source=test")
+        await client.post("/containers/A/unhealthy?unhealthy=false&source=test")
+        await client.post("/containers/B/unhealthy?unhealthy=false&source=test")
         await client.post("/split", json={"A": 100, "B": 0, "source": "test"})
+        await asyncio.sleep(0.5)
 
         # Fire a delayed request in background (delay = 2 seconds)
         async def slow_request():
