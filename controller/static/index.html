@@ -3,294 +3,967 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Docker Load Balancer Control Center</title>
-  <link rel="stylesheet" href="/static/styles.css">
+  <title>Docker Load Balancer — Controller & MCP Mesh Monitor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=3.5">
 </head>
-<body class="dark-theme">
-  <div class="app-container">
-    
-    <!-- Top Navigation Header -->
-    <header class="top-nav">
-      <div class="brand">
-        <div class="brand-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            <line x1="6" y1="6" x2="6.01" y2="6"></line>
-            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+<body class="mesh-body">
+  <!-- Ambient Glow Light Orbs -->
+  <div class="ambient-glow orb-blue"></div>
+  <div class="ambient-glow orb-purple"></div>
+  <div class="ambient-glow orb-cyan"></div>
+  <div class="ambient-glow orb-teal"></div>
+
+  <div class="saas-layout">
+    <!-- Left Translucent Glass Sidebar -->
+    <aside class="sidebar-glass">
+      <div class="sidebar-top">
+        <div class="sidebar-brand-mark">
+          <svg class="hex-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" stroke="url(#logo-grad)" stroke-width="2.5" fill="rgba(6, 182, 212, 0.12)"/>
+            <polygon points="16,6 26,11 26,21 16,26 6,21 6,11" fill="url(#logo-grad-inner)"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#818cf8"/>
+              </linearGradient>
+              <linearGradient id="logo-grad-inner" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(56, 189, 248, 0.6)"/>
+                <stop offset="100%" stop-color="rgba(168, 85, 247, 0.6)"/>
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div>
-          <div class="brand-title">Docker Load Balancer</div>
-          <div class="brand-subtitle">Controller & MCP Mesh Monitor</div>
-        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#dashboard" class="nav-item active">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+
+          <a href="#containers" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>Containers</span>
+          </a>
+
+          <a href="#traffic-split" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+            <span>Traffic Split</span>
+          </a>
+
+          <a href="#traffic-generator" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Load Generator</span>
+          </a>
+
+          <a href="#audit-log" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>MCP Logs</span>
+          </a>
+
+          <a href="#system" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>System</span>
+          </a>
+
+          <a href="#settings" class="nav-item">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Settings</span>
+          </a>
+        </nav>
       </div>
 
-      <div class="header-badges">
-        <div class="badge mcp-indicator" id="mcp-sync-badge">
-          <span class="status-dot green pulse"></span>
-          <span>MCP Client: Ready</span>
+      <div class="sidebar-bottom">
+        <div class="docker-icon-wrap">
+          <svg class="docker-whale" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 14c.5-2 2-3 4-3h8c2 0 3.5 1 4 3 1.5 2 1 4.5-1 5.5-2 1-13 1-15 0-1-.5-1.5-2-1-3.5"></path>
+            <rect x="5" y="8" width="2" height="2" rx="0.5" fill="currentColor"></rect>
+            <rect x="8" y="8" width="2" height="2" rx="0.5" fill="currentColor"></rect>
+            <rect x="11" y="8" width="2" height="2" rx="0.5" fill="currentColor"></rect>
+            <rect x="8" y="5" width="2" height="2" rx="0.5" fill="currentColor"></rect>
+            <rect x="11" y="5" width="2" height="2" rx="0.5" fill="currentColor"></rect>
+            <circle cx="17.5" cy="14.5" r="0.6" fill="currentColor"></circle>
+          </svg>
         </div>
-        <div class="badge health-badge" id="cluster-health-badge">
-          <span class="status-dot green"></span>
-          <span>Cluster Active</span>
+
+        <div class="glass-mini-status">
+          <div class="mini-status-header">Cluster Status</div>
+          <div class="mini-status-body">
+            <span class="status-dot dot-green"></span>
+            <span class="status-name" id="sidebar-cluster-status">Healthy</span>
+          </div>
+          <div class="mini-status-sub" id="sidebar-cluster-count">2/2 containers</div>
         </div>
       </div>
-    </header>
+    </aside>
 
-    <!-- Main Grid Content -->
-    <main class="dashboard-grid">
-
-      <!-- Column 1 & 2: Containers Status Cards -->
-      <section class="section-full">
-        <div class="section-header">
-          <h2>Container Cluster Nodes</h2>
-          <span class="section-desc">Real-time status, health check responses, and container controls</span>
+    <!-- Main Content Area -->
+    <div class="main-viewport">
+      <!-- Top Glass Navigation Header -->
+      <header class="glass-header">
+        <div class="header-brand-block">
+          <div class="cube-icon-wrapper">
+            <svg class="cube-3d-icon" width="34" height="34" viewBox="0 0 36 36" fill="none">
+              <!-- Isometric 3D Server Cube -->
+              <polygon points="18,3 33,11 18,19 3,11" fill="url(#cube-top)" stroke="#38bdf8" stroke-width="1.2"/>
+              <polygon points="3,11 18,19 18,33 3,25" fill="url(#cube-left)" stroke="#0284c7" stroke-width="1.2"/>
+              <polygon points="18,19 33,11 33,25 18,33" fill="url(#cube-right)" stroke="#0ea5e9" stroke-width="1.2"/>
+              <circle cx="18" cy="11" r="1.5" fill="#ffffff" opacity="0.9"/>
+              <circle cx="11" cy="23" r="1" fill="#38bdf8"/>
+              <circle cx="25" cy="23" r="1" fill="#818cf8"/>
+              <defs>
+                <linearGradient id="cube-top" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#0284c7"/>
+                </linearGradient>
+                <linearGradient id="cube-left" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#075985"/>
+                  <stop offset="100%" stop-color="#0369a1"/>
+                </linearGradient>
+                <linearGradient id="cube-right" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7"/>
+                  <stop offset="100%" stop-color="#0c4a6e"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <h1 class="main-title">Docker Load Balancer</h1>
+            <span class="sub-title">Controller & MCP Mesh Monitor</span>
+          </div>
         </div>
 
-        <div class="containers-grid">
+        <div class="header-status-group">
+          <div class="pill-badge" id="mcp-client-pill">
+            <span class="status-dot dot-green dot-pulse"></span>
+            <span class="pill-text">MCP Client: Ready</span>
+          </div>
+
+          <div class="pill-badge" id="cluster-active-pill">
+            <span class="status-dot dot-green"></span>
+            <span class="pill-text">Cluster Active</span>
+          </div>
+
+          <div class="datetime-widget" id="clock-widget">
+            <svg class="dt-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <div class="dt-content">
+              <span class="dt-date" id="live-date">Tue, 14 Oct 2026</span>
+              <span class="dt-time" id="live-time">15:14:23</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Grid Content -->
+      <main class="dashboard-body" id="dashboard">
+        
+        <!-- ROW 1: Container Monitoring Cards (Side-by-Side) -->
+        <section class="containers-row" id="containers">
           
           <!-- Container A Card -->
-          <div class="card container-card" id="card-container-a">
-            <div class="card-header">
-              <div class="container-title">
-                <span class="node-icon a-glow">A</span>
-                <div>
-                  <div class="node-name">Container A</div>
-                  <div class="node-sub">container_a (Port 8001)</div>
+          <div class="glass-panel container-panel panel-cyan-glow" id="panel-container-a">
+            <div class="panel-header">
+              <div class="node-title-group">
+                <div class="node-badge badge-a">A</div>
+                <div class="node-meta">
+                  <h3 class="node-heading">Container A</h3>
+                  <span class="node-subheading">container_a (Port 8001)</span>
                 </div>
               </div>
-              <div class="status-pill" id="status-pill-a">Healthy</div>
+              <div class="panel-header-right">
+                <div class="status-tag tag-healthy" id="tag-container-a">
+                  <svg class="heartbeat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  <span>HEALTHY</span>
+                </div>
+                <button class="icon-menu-btn" title="Options" onclick="toggleContainerControls('a')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="1.8"></circle>
+                    <circle cx="12" cy="12" r="1.8"></circle>
+                    <circle cx="12" cy="19" r="1.8"></circle>
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            <div class="metrics-row">
-              <div class="metric-item">
-                <div class="metric-label">In Flight</div>
-                <div class="metric-val" id="metric-inflight-a">0</div>
+            <!-- Metric Cards (4 compact items) -->
+            <div class="metric-tiles-row">
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">In Flight</span>
+                  <span class="tile-value" id="val-inflight-a">0</span>
+                </div>
               </div>
-              <div class="metric-item">
-                <div class="metric-label">Served</div>
-                <div class="metric-val" id="metric-served-a">0</div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Served</span>
+                  <span class="tile-value" id="val-served-a">409</span>
+                </div>
               </div>
-              <div class="metric-item">
-                <div class="metric-label">Effective Split</div>
-                <div class="metric-val text-cyan" id="metric-eff-a">50%</div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 3a9 9 0 0 1 9 9"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Success Rate</span>
+                  <span class="tile-value text-cyan" id="val-success-a">100%</span>
+                </div>
+              </div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Avg Response</span>
+                  <span class="tile-value" id="val-latency-a">136 ms</span>
+                </div>
               </div>
             </div>
 
-            <div class="card-actions">
-              <button class="btn btn-outline" id="btn-start-a" onclick="startContainer('A')">Start</button>
-              <button class="btn btn-outline" id="btn-stop-a" onclick="stopContainer('A')">Drain & Stop</button>
-              <button class="btn btn-danger-soft" id="btn-toggle-unhealthy-a" onclick="toggleUnhealthy('A')">Simulate Failure</button>
+            <!-- Chart Section -->
+            <div class="chart-wrapper">
+              <div class="chart-header">
+                <span class="chart-title">Requests (last 5 minutes)</span>
+                <div class="chart-dropdown" id="dropdown-rpm-a">
+                  <span>Avg: 136 RPM</span>
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+
+              <div class="svg-chart-container">
+                <svg class="area-chart-svg" viewBox="0 0 540 120" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="area-grad-a" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.45"/>
+                      <stop offset="60%" stop-color="#0284c7" stop-opacity="0.18"/>
+                      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.0"/>
+                    </linearGradient>
+                    <filter id="neon-glow-a" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  
+                  <!-- Grid Lines -->
+                  <line x1="40" y1="20" x2="530" y2="20" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
+                  <line x1="40" y1="60" x2="530" y2="60" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
+                  <line x1="40" y1="100" x2="530" y2="100" stroke="rgba(255,255,255,0.06)"/>
+
+                  <!-- Y-Axis Labels -->
+                  <text x="32" y="24" class="chart-axis-text">200</text>
+                  <text x="32" y="64" class="chart-axis-text">100</text>
+                  <text x="32" y="104" class="chart-axis-text">0</text>
+
+                  <!-- Area Fill -->
+                  <path d="M 45,100 L 45,78 C 80,68 115,82 150,72 C 185,62 220,74 255,66 C 290,58 325,72 360,65 C 395,58 430,75 465,68 C 495,64 515,66 530,66 L 530,100 Z" fill="url(#area-grad-a)" id="chart-area-path-a"/>
+                  
+                  <!-- Glowing Line -->
+                  <path d="M 45,78 C 80,68 115,82 150,72 C 185,62 220,74 255,66 C 290,58 325,72 360,65 C 395,58 430,75 465,68 C 495,64 515,66 530,66" fill="none" stroke="#00f2fe" stroke-width="2.5" filter="url(#neon-glow-a)" id="chart-line-path-a"/>
+                </svg>
+
+                <div class="chart-time-labels">
+                  <span>15:09</span>
+                  <span>15:10</span>
+                  <span>15:11</span>
+                  <span>15:12</span>
+                  <span>15:13</span>
+                  <span>15:14</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Container Controls Bar -->
+            <div class="container-action-bar" id="controls-bar-a">
+              <button class="action-btn-glass" onclick="startContainer('A')">Start</button>
+              <button class="action-btn-glass" onclick="stopContainer('A')">Drain & Stop</button>
+              <button class="action-btn-danger-glass" id="btn-toggle-unhealthy-a" onclick="toggleUnhealthy('A')">Simulate Failure</button>
             </div>
           </div>
 
           <!-- Container B Card -->
-          <div class="card container-card" id="card-container-b">
-            <div class="card-header">
-              <div class="container-title">
-                <span class="node-icon b-glow">B</span>
-                <div>
-                  <div class="node-name">Container B</div>
-                  <div class="node-sub">container_b (Port 8002)</div>
+          <div class="glass-panel container-panel panel-purple-glow" id="panel-container-b">
+            <div class="panel-header">
+              <div class="node-title-group">
+                <div class="node-badge badge-b">B</div>
+                <div class="node-meta">
+                  <h3 class="node-heading">Container B</h3>
+                  <span class="node-subheading">container_b (Port 8002)</span>
                 </div>
               </div>
-              <div class="status-pill" id="status-pill-b">Healthy</div>
-            </div>
-
-            <div class="metrics-row">
-              <div class="metric-item">
-                <div class="metric-label">In Flight</div>
-                <div class="metric-val" id="metric-inflight-b">0</div>
-              </div>
-              <div class="metric-item">
-                <div class="metric-label">Served</div>
-                <div class="metric-val" id="metric-served-b">0</div>
-              </div>
-              <div class="metric-item">
-                <div class="metric-label">Effective Split</div>
-                <div class="metric-val text-purple" id="metric-eff-b">50%</div>
+              <div class="panel-header-right">
+                <div class="status-tag tag-stopped" id="tag-container-b">
+                  <span class="square-stop-icon"></span>
+                  <span>STOPPED</span>
+                </div>
+                <button class="icon-menu-btn" title="Options" onclick="toggleContainerControls('b')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="1.8"></circle>
+                    <circle cx="12" cy="12" r="1.8"></circle>
+                    <circle cx="12" cy="19" r="1.8"></circle>
+                  </svg>
+                </button>
               </div>
             </div>
 
-            <div class="card-actions">
-              <button class="btn btn-outline" id="btn-start-b" onclick="startContainer('B')">Start</button>
-              <button class="btn btn-outline" id="btn-stop-b" onclick="stopContainer('B')">Drain & Stop</button>
-              <button class="btn btn-danger-soft" id="btn-toggle-unhealthy-b" onclick="toggleUnhealthy('B')">Simulate Failure</button>
+            <!-- Metric Cards (4 compact items) -->
+            <div class="metric-tiles-row">
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2">
+                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">In Flight</span>
+                  <span class="tile-value" id="val-inflight-b">0</span>
+                </div>
+              </div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Served</span>
+                  <span class="tile-value" id="val-served-b">21</span>
+                </div>
+              </div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 3a9 9 0 0 1 0 0"></path>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Success Rate</span>
+                  <span class="tile-value text-magenta" id="val-success-b">0%</span>
+                </div>
+              </div>
+
+              <div class="metric-tile">
+                <div class="tile-icon-area">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <div class="tile-content">
+                  <span class="tile-label">Avg Response</span>
+                  <span class="tile-value" id="val-latency-b">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-wrapper">
+              <div class="chart-header">
+                <span class="chart-title">Requests (last 5 minutes)</span>
+                <div class="chart-dropdown" id="dropdown-rpm-b">
+                  <span>Avg: 0 RPM</span>
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+
+              <div class="svg-chart-container">
+                <svg class="area-chart-svg" viewBox="0 0 540 120" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="area-grad-b" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#ec4899" stop-opacity="0.0"/>
+                    </linearGradient>
+                    <filter id="neon-glow-b" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  
+                  <!-- Grid Lines -->
+                  <line x1="40" y1="20" x2="530" y2="20" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
+                  <line x1="40" y1="60" x2="530" y2="60" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
+                  <line x1="40" y1="100" x2="530" y2="100" stroke="rgba(255,255,255,0.06)"/>
+
+                  <!-- Y-Axis Labels -->
+                  <text x="32" y="24" class="chart-axis-text">200</text>
+                  <text x="32" y="64" class="chart-axis-text">100</text>
+                  <text x="32" y="104" class="chart-axis-text">0</text>
+
+                  <!-- Flat Line for Stopped Container B -->
+                  <path d="M 45,99 L 530,99" fill="none" stroke="#d946ef" stroke-width="2" filter="url(#neon-glow-b)" id="chart-line-path-b"/>
+                </svg>
+
+                <div class="chart-time-labels">
+                  <span>15:09</span>
+                  <span>15:10</span>
+                  <span>15:11</span>
+                  <span>15:12</span>
+                  <span>15:13</span>
+                  <span>15:14</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Container Controls Bar -->
+            <div class="container-action-bar" id="controls-bar-b">
+              <button class="action-btn-glass" onclick="startContainer('B')">Start</button>
+              <button class="action-btn-glass" onclick="stopContainer('B')">Drain & Stop</button>
+              <button class="action-btn-danger-glass" id="btn-toggle-unhealthy-b" onclick="toggleUnhealthy('B')">Simulate Failure</button>
             </div>
           </div>
 
-        </div>
-      </section>
+        </section>
 
-      <!-- Traffic Routing & Split Controls -->
-      <section class="card split-control-card">
-        <div class="card-header">
-          <h3>Traffic Split & Routing</h3>
-          <span class="badge" id="split-mode-badge">Active: A=50% / B=50%</span>
-        </div>
+        <!-- ROW 2: Traffic Split & Routing + Safe Rollout Orchestrator -->
+        <section class="row-two-col">
+          
+          <!-- Traffic Split & Routing Card -->
+          <div class="glass-panel panel-routing" id="traffic-split">
+            <div class="panel-header">
+              <div class="title-with-icon">
+                <div class="section-icon-wrap icon-cyan">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="16 3 21 3 21 8"></polyline>
+                    <line x1="4" y1="20" x2="21" y2="3"></line>
+                    <polyline points="21 16 21 21 16 21"></polyline>
+                    <line x1="15" y1="15" x2="21" y2="21"></line>
+                    <line x1="4" y1="4" x2="9" y2="9"></line>
+                  </svg>
+                </div>
+                <h3 class="section-title">Traffic Split & Routing</h3>
+              </div>
+              <div class="chip-status" id="chip-active-split">Active Split: A=100% / B=0%</div>
+            </div>
 
-        <div class="split-slider-wrapper">
-          <div class="split-slider-labels">
-            <span class="label-a">Container A: <strong id="val-split-a">50%</strong></span>
-            <span class="label-b">Container B: <strong id="val-split-b">50%</strong></span>
+            <!-- Percentage Slider & Visual Split Controls -->
+            <div class="split-slider-wrapper">
+              <div class="split-slider-labels">
+                <span class="label-a">Container A: <strong id="val-split-a">100%</strong></span>
+                <span class="label-b">Container B: <strong id="val-split-b">0%</strong></span>
+              </div>
+
+              <div class="slider-container">
+                <input type="range" min="0" max="100" value="100" class="neon-range-slider" id="split-slider" oninput="onSliderChange(this.value)">
+              </div>
+
+              <!-- Visual Dual-Color Segmented Ratio Bar -->
+              <div class="ratio-bar">
+                <div class="bar-segment bar-a" id="visual-bar-a" style="width: 100%;">A (100%)</div>
+                <div class="bar-segment bar-b" id="visual-bar-b" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Preset Buttons Row & Apply Split Action -->
+            <div class="presets-action-row">
+              <div class="preset-group">
+                <button class="preset-pill active" id="preset-100-a" onclick="setPreset(100, 0)">100% A</button>
+                <button class="preset-pill" id="preset-80-20" onclick="setPreset(80, 20)">80/20</button>
+                <button class="preset-pill" id="preset-50-50" onclick="setPreset(50, 50)">50/50</button>
+                <button class="preset-pill" id="preset-20-80" onclick="setPreset(20, 80)">20/80</button>
+                <button class="preset-pill" id="preset-100-b" onclick="setPreset(0, 100)">100% B</button>
+              </div>
+
+              <button class="btn-luminous-primary" id="btn-apply-split" onclick="applySplit()">
+                <span>Apply Split</span>
+              </button>
+            </div>
           </div>
 
-          <div class="slider-container">
-            <input type="range" min="0" max="100" value="50" class="split-slider" id="split-slider" oninput="onSliderChange(this.value)">
+          <!-- Safe Rollout Orchestrator Card -->
+          <div class="glass-panel panel-rollout">
+            <div class="panel-header">
+              <div class="title-with-icon">
+                <div class="section-icon-wrap icon-blue">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </div>
+                <h3 class="section-title">Safe Rollout Orchestrator</h3>
+              </div>
+              <div class="tag-completed" id="rollout-status-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Completed</span>
+              </div>
+            </div>
+
+            <!-- 5 Evenly Spaced Connected Circular Steps -->
+            <div class="stepper-track-wrap">
+              <div class="stepper-item step-completed" id="rollout-step-1">
+                <div class="step-num-ring">1</div>
+                <span class="step-text">Start<br>Target</span>
+              </div>
+              <div class="stepper-connector active-connector" id="conn-1-2"></div>
+
+              <div class="stepper-item step-completed" id="rollout-step-2">
+                <div class="step-num-ring">2</div>
+                <span class="step-text">Wait<br>Healthy</span>
+              </div>
+              <div class="stepper-connector active-connector" id="conn-2-3"></div>
+
+              <div class="stepper-item step-completed" id="rollout-step-3">
+                <div class="step-num-ring">3</div>
+                <span class="step-text">Move<br>Traffic</span>
+              </div>
+              <div class="stepper-connector active-connector" id="conn-3-4"></div>
+
+              <div class="stepper-item step-completed" id="rollout-step-4">
+                <div class="step-num-ring">4</div>
+                <span class="step-text">Drain<br>Old</span>
+              </div>
+              <div class="stepper-connector active-connector" id="conn-4-5"></div>
+
+              <div class="stepper-item step-completed" id="rollout-step-5">
+                <div class="step-num-ring">5</div>
+                <span class="step-text">Stop<br>Old</span>
+              </div>
+            </div>
+
+            <!-- Safe Rollout Action Buttons -->
+            <div class="rollout-buttons-row">
+              <button class="btn-rollout-primary" id="btn-rollout-ab" onclick="startRollout('A', 'B')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <span>Safe Rollout: A &rarr; B</span>
+              </button>
+
+              <button class="btn-rollout-secondary" id="btn-rollout-ba" onclick="startRollout('B', 'A')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Safe Rollout: B &rarr; A</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Visual Bar Representation -->
-          <div class="ratio-bar">
-            <div class="bar-segment bar-a" id="visual-bar-a" style="width: 50%;">A (50%)</div>
-            <div class="bar-segment bar-b" id="visual-bar-b" style="width: 50%;">B (50%)</div>
-          </div>
-        </div>
+        </section>
 
-        <div class="preset-buttons">
-          <button class="btn btn-ghost" onclick="setPreset(100, 0)">100% A</button>
-          <button class="btn btn-ghost" onclick="setPreset(80, 20)">80/20</button>
-          <button class="btn btn-ghost" onclick="setPreset(50, 50)">50/50</button>
-          <button class="btn btn-ghost" onclick="setPreset(20, 80)">20/80</button>
-          <button class="btn btn-ghost" onclick="setPreset(0, 100)">100% B</button>
-          <button class="btn btn-primary" onclick="applySplit()">Apply Split</button>
-        </div>
-      </section>
+        <!-- ROW 3: Traffic Generator + Traffic Distribution -->
+        <section class="row-two-col" id="traffic-generator">
+          
+          <!-- Traffic Generator Panel -->
+          <div class="glass-panel panel-generator">
+            <div class="panel-header">
+              <div class="title-with-icon">
+                <div class="section-icon-wrap icon-amber">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <h3 class="section-title">Load Balancer Traffic Generator</h3>
+              </div>
+              <div class="chip-status" id="tg-status-chip">
+                <span class="status-dot dot-gray"></span>
+                <span id="tg-status-text">Stopped</span>
+              </div>
+            </div>
 
-      <!-- Safe Rollout Orchestrator -->
-      <section class="card rollout-card">
-        <div class="card-header">
-          <h3>Safe Rollout Orchestrator</h3>
-          <span class="badge" id="rollout-status-badge">Idle</span>
-        </div>
+            <!-- Top Controls Row -->
+            <div class="gen-top-controls">
+              <div class="rpm-input-group">
+                <label for="traffic-rpm">Target Rate (RPM)</label>
+                <div class="stepper-input-wrap">
+                  <input type="number" id="traffic-rpm" value="120" min="10" max="6000" step="10">
+                </div>
+              </div>
 
-        <div class="rollout-stepper">
-          <div class="step-item" id="step-start">
-            <div class="step-circle">1</div>
-            <div class="step-label">Start Target</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" id="step-health">
-            <div class="step-circle">2</div>
-            <div class="step-label">Wait Healthy</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" id="step-shift">
-            <div class="step-circle">3</div>
-            <div class="step-label">Move Traffic</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" id="step-drain">
-            <div class="step-circle">4</div>
-            <div class="step-label">Drain Old</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" id="step-stop">
-            <div class="step-circle">5</div>
-            <div class="step-label">Stop Old</div>
-          </div>
-        </div>
+              <button class="btn-luminous-green" id="btn-toggle-traffic" onclick="toggleTrafficGen()">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Start Traffic</span>
+              </button>
 
-        <div class="rollout-buttons">
-          <button class="btn btn-action" id="btn-rollout-ab" onclick="startRollout('A', 'B')">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            Safe Rollout: A &rarr; B
-          </button>
-          <button class="btn btn-action" id="btn-rollout-ba" onclick="startRollout('B', 'A')">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Safe Rollout: B &rarr; A
-          </button>
-        </div>
-      </section>
+              <button class="btn-translucent-reset" onclick="resetTrafficStats()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                <span>Reset Stats</span>
+              </button>
+            </div>
 
-      <!-- Traffic Generator Panel -->
-      <section class="card traffic-card">
-        <div class="card-header">
-          <h3>Load Balancer Traffic Generator</h3>
-          <span class="badge" id="traffic-gen-badge">Stopped</span>
-        </div>
+            <!-- Metrics & Bar Chart Flexbox -->
+            <div class="gen-metrics-and-chart">
+              
+              <!-- 5 Compact Metric Cards -->
+              <div class="gen-metric-cards-col">
+                <div class="gen-metric-card">
+                  <div class="gen-metric-icon bg-purple-soft">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+                      <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                  </div>
+                  <div class="gen-metric-info">
+                    <span class="gen-num" id="stat-total">369</span>
+                    <span class="gen-lbl">Total Sent</span>
+                  </div>
+                </div>
 
-        <div class="traffic-controls">
-          <div class="input-group">
-            <label for="traffic-rpm">Target Rate (RPM):</label>
-            <input type="number" id="traffic-rpm" value="120" min="10" max="6000" step="10">
-          </div>
-          <div class="traffic-btn-group">
-            <button class="btn btn-success" id="btn-toggle-traffic" onclick="toggleTrafficGen()">Start Traffic</button>
-            <button class="btn btn-ghost" onclick="resetTrafficStats()">Reset Stats</button>
-          </div>
-        </div>
+                <div class="gen-metric-card">
+                  <div class="gen-metric-icon bg-green-soft">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="gen-metric-info">
+                    <span class="gen-num text-green" id="stat-success">369</span>
+                    <span class="gen-lbl">Success (200)</span>
+                  </div>
+                </div>
 
-        <div class="traffic-stats-grid">
-          <div class="stat-box">
-            <div class="stat-num" id="stat-total">0</div>
-            <div class="stat-label">Total Sent</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num text-green" id="stat-success">0</div>
-            <div class="stat-label">Success (200)</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num text-red" id="stat-failed">0</div>
-            <div class="stat-label">Failed (5xx)</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num text-cyan" id="stat-by-a">0</div>
-            <div class="stat-label">Served by A</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num text-purple" id="stat-by-b">0</div>
-            <div class="stat-label">Served by B</div>
-          </div>
-        </div>
-      </section>
+                <div class="gen-metric-card">
+                  <div class="gen-metric-icon bg-red-soft">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </div>
+                  <div class="gen-metric-info">
+                    <span class="gen-num text-red" id="stat-failed">0</span>
+                    <span class="gen-lbl">Failed (5xx)</span>
+                  </div>
+                </div>
 
-      <!-- Event Logs Feed -->
-      <section class="card logs-card section-full">
-        <div class="card-header">
-          <div class="log-title-area">
-            <h3>Controller & MCP Audit Log</h3>
-            <span class="sub-text">Every action logged with source, time, and result</span>
+                <div class="gen-metric-card">
+                  <div class="gen-metric-icon bg-cyan-soft">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2">
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <polyline points="9 21 3 21 3 15"></polyline>
+                      <line x1="21" y1="3" x2="14" y2="10"></line>
+                      <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                  </div>
+                  <div class="gen-metric-info">
+                    <span class="gen-num text-cyan" id="stat-by-a">369</span>
+                    <span class="gen-lbl">Served by A</span>
+                  </div>
+                </div>
+
+                <div class="gen-metric-card">
+                  <div class="gen-metric-icon bg-violet-soft">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="gen-metric-info">
+                    <span class="gen-num text-purple" id="stat-by-b">0</span>
+                    <span class="gen-lbl">Served by B</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Compact Vertical Bar Chart on Right -->
+              <div class="gen-barchart-container">
+                <div class="barchart-header">
+                  <span class="barchart-title">Requests per second</span>
+                </div>
+                <div class="svg-barchart-wrap">
+                  <svg class="bar-chart-svg" viewBox="0 0 240 100" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="bar-cyan-grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#38bdf8"/>
+                        <stop offset="100%" stop-color="#0284c7"/>
+                      </linearGradient>
+                      <filter id="bar-glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="1.5" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                      </filter>
+                    </defs>
+
+                    <!-- Subtle Horizontal Grid Lines -->
+                    <line x1="10" y1="20" x2="215" y2="20" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+                    <line x1="10" y1="55" x2="215" y2="55" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+                    <line x1="10" y1="90" x2="215" y2="90" stroke="rgba(255,255,255,0.1)"/>
+
+                    <!-- Y-Axis Labels on Right -->
+                    <text x="220" y="24" class="chart-axis-text">200</text>
+                    <text x="220" y="59" class="chart-axis-text">100</text>
+                    <text x="220" y="94" class="chart-axis-text">0</text>
+
+                    <!-- Neon Cyan Vertical Bars (varied heights matching mockup) -->
+                    <g id="dynamic-bars-group">
+                      <rect x="15" y="70" width="4" height="20" rx="1.5" fill="url(#bar-cyan-grad)" filter="url(#bar-glow)"/>
+                      <rect x="23" y="62" width="4" height="28" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="31" y="78" width="4" height="12" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="39" y="50" width="4" height="40" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="47" y="65" width="4" height="25" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="55" y="45" width="4" height="45" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="63" y="60" width="4" height="30" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="71" y="72" width="4" height="18" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="79" y="55" width="4" height="35" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="87" y="48" width="4" height="42" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="95" y="68" width="4" height="22" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="103" y="40" width="4" height="50" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="111" y="58" width="4" height="32" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="119" y="42" width="4" height="48" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="127" y="64" width="4" height="26" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="135" y="52" width="4" height="38" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="143" y="46" width="4" height="44" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="151" y="68" width="4" height="22" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="159" y="54" width="4" height="36" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="167" y="44" width="4" height="46" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="175" y="62" width="4" height="28" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="183" y="50" width="4" height="40" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="191" y="72" width="4" height="18" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="199" y="58" width="4" height="32" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                      <rect x="207" y="66" width="4" height="24" rx="1.5" fill="url(#bar-cyan-grad)"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          <div class="log-filter-tabs">
-            <button class="filter-tab active" onclick="filterLogs('all')">All</button>
-            <button class="filter-tab" onclick="filterLogs('mcp')">MCP Only</button>
-            <button class="filter-tab" onclick="filterLogs('dashboard')">Dashboard</button>
-            <button class="filter-tab" onclick="filterLogs('system')">System</button>
+          <!-- Traffic Distribution Analytics Card -->
+          <div class="glass-panel panel-distribution">
+            <div class="panel-header">
+              <div class="title-with-icon">
+                <div class="section-icon-wrap icon-blue">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                </div>
+                <h3 class="section-title">Traffic Distribution</h3>
+              </div>
+              <div class="chart-dropdown">
+                <span>Last 5 minutes</span>
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </div>
+            </div>
+
+            <div class="donut-analytics-content">
+              <!-- Luminous Cyan Donut Chart -->
+              <div class="donut-chart-wrap">
+                <svg class="donut-svg" viewBox="0 0 160 160">
+                  <defs>
+                    <linearGradient id="donut-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38bdf8"/>
+                      <stop offset="100%" stop-color="#0284c7"/>
+                    </linearGradient>
+                    <linearGradient id="donut-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#a855f7"/>
+                      <stop offset="100%" stop-color="#7c3aed"/>
+                    </linearGradient>
+                    <filter id="donut-glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  <!-- Background Ring -->
+                  <circle cx="80" cy="80" r="62" stroke="rgba(255,255,255,0.06)" stroke-width="16" fill="none"/>
+                  
+                  <!-- Container B Segment (Arc) -->
+                  <circle id="donut-seg-b" cx="80" cy="80" r="62" stroke="url(#donut-purple)" stroke-width="16" fill="none"
+                          stroke-dasharray="389.5" stroke-dashoffset="389.5" transform="rotate(-90 80 80)"/>
+
+                  <!-- Container A Segment (Arc) - Default 100% (389.5 circumference) -->
+                  <circle id="donut-seg-a" cx="80" cy="80" r="62" stroke="url(#donut-cyan)" stroke-width="16" fill="none"
+                          stroke-dasharray="389.5" stroke-dashoffset="0" filter="url(#donut-glow)" transform="rotate(-90 80 80)"/>
+                </svg>
+
+                <div class="donut-center-text">
+                  <span class="donut-count" id="donut-total-count">369</span>
+                  <span class="donut-sublabel">Total Requests</span>
+                </div>
+              </div>
+
+              <!-- Legend List -->
+              <div class="distribution-legend">
+                <div class="legend-row">
+                  <div class="legend-ident">
+                    <span class="legend-dot dot-blue-pill"></span>
+                    <span class="legend-label">Container A</span>
+                  </div>
+                  <div class="legend-stats">
+                    <span class="legend-value" id="dist-count-a">369</span>
+                    <span class="legend-percent" id="dist-pct-a">100%</span>
+                  </div>
+                </div>
+
+                <div class="legend-row">
+                  <div class="legend-ident">
+                    <span class="legend-dot dot-purple-pill"></span>
+                    <span class="legend-label">Container B</span>
+                  </div>
+                  <div class="legend-stats">
+                    <span class="legend-value" id="dist-count-b">0</span>
+                    <span class="legend-percent" id="dist-pct-b">0%</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
-        </div>
 
-        <div class="table-container">
-          <table class="logs-table">
-            <thead>
-              <tr>
-                <th style="width: 110px;">Time</th>
-                <th style="width: 100px;">Source</th>
-                <th style="width: 170px;">Action</th>
-                <th style="width: 110px;">Result</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody id="logs-tbody">
-              <tr>
-                <td colspan="5" class="empty-state">Loading controller event history...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+        </section>
 
-    </main>
+        <!-- ROW 4: Controller & MCP Audit Log (Full Width) -->
+        <section class="glass-panel panel-audit-log" id="audit-log">
+          <div class="panel-header">
+            <div class="title-with-icon">
+              <div class="section-icon-wrap icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div class="title-text-group">
+                <h3 class="section-title">Controller & MCP Audit Log</h3>
+                <span class="section-subtext">Every action logged with source, time, and result</span>
+              </div>
+            </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="toast"></div>
+            <!-- Filter Tabs -->
+            <div class="audit-filter-tabs">
+              <button class="audit-tab active" onclick="filterLogs('all')">All</button>
+              <button class="audit-tab" onclick="filterLogs('mcp')">MCP Only</button>
+              <button class="audit-tab" onclick="filterLogs('dashboard')">Dashboard</button>
+              <button class="audit-tab" onclick="filterLogs('system')">System</button>
+            </div>
+          </div>
 
+          <!-- High Density Table -->
+          <div class="table-scroll-container">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">Time</th>
+                  <th style="width: 130px;">Source</th>
+                  <th style="width: 170px;">Action</th>
+                  <th style="width: 120px;">Result</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <!-- Example rows or populated live from backend -->
+                <tr>
+                  <td class="cell-time">09:44:23.675</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">change_split</td>
+                  <td><span class="badge-result res-rejected">REJECTED</span></td>
+                  <td class="cell-details"><code>{"container":"B","assigned_percent":54,"status":"stopped"}</code></td>
+                </tr>
+                <tr>
+                  <td class="cell-time">09:44:17.105</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">change_split</td>
+                  <td><span class="badge-result res-rejected">REJECTED</span></td>
+                  <td class="cell-details"><code>{"container":"B","assigned_percent":50,"status":"stopped"}</code></td>
+                </tr>
+                <tr>
+                  <td class="cell-time">09:44:15.296</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">change_split</td>
+                  <td><span class="badge-result res-rejected">REJECTED</span></td>
+                  <td class="cell-details"><code>{"container":"B","assigned_percent":80,"status":"stopped"}</code></td>
+                </tr>
+                <tr>
+                  <td class="cell-time">09:44:12.207</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">change_split</td>
+                  <td><span class="badge-result res-rejected">REJECTED</span></td>
+                  <td class="cell-details"><code>{"container":"B","assigned_percent":100,"status":"stopped"}</code></td>
+                </tr>
+                <tr>
+                  <td class="cell-time">09:00:48.313</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">stop_container</td>
+                  <td><span class="badge-result res-rejected">REJECTED</span></td>
+                  <td class="cell-details"><code>{"container":"A","reason":"Last healthy container"}</code></td>
+                </tr>
+                <tr>
+                  <td class="cell-time">09:00:47.256</td>
+                  <td><span class="badge-source src-dashboard">DASHBOARD</span></td>
+                  <td class="cell-action">stop_container</td>
+                  <td><span class="badge-result res-success">SUCCESS</span></td>
+                  <td class="cell-details"><code>{"container":"B"}</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
   </div>
 
-  <script src="/static/app.js"></script>
+  <!-- Notification Toast -->
+  <div id="toast" class="toast-glass"></div>
+
+  <script src="/static/app.js?v=3.5"></script>
 </body>
 </html>
